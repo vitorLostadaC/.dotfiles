@@ -31,68 +31,88 @@ SPACESHIP_CHAR_SUFFIX=" "
 
 # Alias
 
+## general
+
 alias vim=nvim
+alias pip="pip3"
+
+
+## shell
 
 alias c="clear"
 
-alias t="tmux"
-alias ga="git add ."
-alias gs="git status -s"
-alias pip="pip3"
 
-function tn(){
-	tmux new-session -s "$1"
+## git
+
+alias gs="git status -s"
+
+function ga() {
+    if [ -z "$1" ]; then
+        git add .
+    else
+        git add "$1"
+    fi
 }
 
+unalias gc
 function gc() {
     local message="$*"
     git commit -m "$message"
 }
 
+
+## tmux 
+
+alias t="tmux"
+
+function tn(){
+	tmux new-session -s "$1"
+}
+
+
+## zoxide
+
+function find_dir() {
+    if [ -z "$1" ]; then
+        echo "Usage: $2 <query>"
+        return 1
+    fi
+
+    local dir
+    dir=$(zoxide query -i "$1")
+
+    if [ -z "$dir" ]; then
+        echo "No matching directory found for query: $1"
+        return 1
+    fi
+
+    echo "$dir"
+}
+
+## Function to open the directory in Visual Studio Code
+function zc() {
+    local dir
+    dir=$(find_dir "$1" "zcode")
+
+    if [ $? -eq 0 ]; then
+        cursor "$dir"
+    fi
+}
+
+## Function to open the directory in Vim
+function zv() {
+    local dir
+    dir=$(find_dir "$1" "zcode")
+
+    if [ $? -eq 0 ]; then
+        cd "$dir" || return
+        vim .
+    fi
+}
+
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 PATH=~/.console-ninja/.bin:$PATH
-
-eval "$(zoxide init zsh)"
-
-function zc() {
-    if [ -z "$1" ]; then
-        echo "Usage: zcode <query>"
-        return 1
-    fi
-
-    # Use zoxide to find the directory
-    local dir
-    dir=$(zoxide query -i "$1")
-
-    if [ -z "$dir" ]; then
-        echo "No matching directory found for query: $1"
-        return 1
-    fi
-
-    # Open the directory in Visual Studio Code
-    cursor "$dir"
-}
-
-
-function zv() {
-    if [ -z "$1" ]; then
-        echo "Usage: zcode <query>"
-        return 1
-    fi
-
-    # Use zoxide to find the directory
-    local dir
-    dir=$(zoxide query -i "$1")
-
-    if [ -z "$dir" ]; then
-        echo "No matching directory found for query: $1"
-        return 1
-    fi
-
-    # Open the directory in Visual Studio Code
-    vim "$dir"
-}
-
 
 
 export NVM_DIR="$HOME/.nvm"
@@ -114,3 +134,5 @@ esac
 # pnpm end
 
 eval $(thefuck --alias)
+eval "$(zoxide init zsh)"
+
