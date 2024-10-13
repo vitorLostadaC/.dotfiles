@@ -68,6 +68,16 @@ return {
       follow_current_file = { enabled = true },
       use_libuv_file_watcher = true,
     },
+    event_handlers = {
+      {
+        event = "neo_tree_buffer_enter",
+        handler = function(arg)
+          vim.cmd([[
+          setlocal relativenumber
+        ]])
+        end,
+      },
+    },
     window = {
       mappings = {
         ["l"] = "open",
