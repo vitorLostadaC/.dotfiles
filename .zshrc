@@ -136,3 +136,10 @@ esac
 eval $(thefuck --alias)
 eval "$(zoxide init zsh)"
 
+
+# bun completions
+[ -s "/Users/vitorlostada/.oh-my-zsh/completions/_bun" ] && source "/Users/vitorlostada/.oh-my-zsh/completions/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
