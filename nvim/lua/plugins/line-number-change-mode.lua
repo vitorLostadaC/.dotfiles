@@ -11,30 +11,32 @@ return {
     end
 
     require("line-number-change-mode").setup({
-      i = {
-        bg = palette.green,
-        fg = palette.mantle,
-        bold = true,
-      },
-      n = {
-        bg = palette.blue,
-        fg = palette.mantle,
-        bold = true,
-      },
-      R = {
-        bg = palette.maroon,
-        fg = palette.mantle,
-        bold = true,
-      },
-      v = {
-        bg = palette.mauve,
-        fg = palette.mantle,
-        bold = true,
-      },
-      V = {
-        bg = palette.mauve,
-        fg = palette.mantle,
-        bold = true,
+      mode = {
+        i = {
+          bg = palette.green,
+          fg = palette.mantle,
+          bold = true,
+        },
+        n = {
+          bg = palette.blue,
+          fg = palette.mantle,
+          bold = true,
+        },
+        R = {
+          bg = palette.maroon,
+          fg = palette.mantle,
+          bold = true,
+        },
+        v = {
+          bg = palette.mauve,
+          fg = palette.mantle,
+          bold = true,
+        },
+        V = {
+          bg = palette.mauve,
+          fg = palette.mantle,
+          bold = true,
+        },
       },
     })
   end,

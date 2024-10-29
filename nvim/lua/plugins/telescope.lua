@@ -28,6 +28,8 @@ return {
         end)
       end,
     },
+    { "nvim-telescope/telescope-file-browser.nvim" },
+    { "nvim-telescope/telescope-project.nvim" },
   },
   keys = {
     {
@@ -94,6 +96,9 @@ return {
     },
   },
   opts = function()
+    pcall(require("telescope").load_extension("file_browser"))
+    pcall(require("telescope").load_extension("project"))
+
     local actions = require("telescope.actions")
 
     local open_with_trouble = function(...)
