@@ -96,8 +96,8 @@ return {
     },
   },
   opts = function()
-    pcall(require("telescope").load_extension("file_browser"))
     pcall(require("telescope").load_extension("project"))
+    pcall(require("telescope").load_extension("file_browser"))
 
     local actions = require("telescope.actions")
 
@@ -144,6 +144,8 @@ return {
       end
     end
 
+    local project_actions = require("telescope._extensions.project.actions")
+
     return {
       defaults = {
         prompt_prefix = " ",
@@ -182,6 +184,50 @@ return {
           find_command = find_command,
           hidden = true,
           no_ignore = true,
+        },
+      },
+      extensions = {
+        project = {
+          base_dirs = {
+            "~/Projects",
+            "~/Work",
+          },
+          hidden_files = true,
+          sync_with_nvim_tree = true,
+          on_project_selected = function(prompt_bufnr)
+            -- Do anything you want in here. For example:
+            project_actions.change_working_directory(prompt_bufnr, false)
+            require("harpoon.ui").nav_file(1)
+          end,
+          order_by = "asc",
+          search_by = "title",
+          mappings = {
+            n = {
+              ["d"] = project_actions.delete_project,
+              ["r"] = project_actions.rename_project,
+              ["c"] = project_actions.add_project,
+              ["C"] = project_actions.add_project_cwd,
+              ["f"] = project_actions.find_project_files,
+              ["b"] = project_actions.browse_project_files,
+              ["s"] = project_actions.search_in_project_files,
+              ["R"] = project_actions.recent_project_files,
+              ["w"] = project_actions.change_working_directory,
+              ["o"] = project_actions.next_cd_scope,
+            },
+            i = {
+              ["<c-d>"] = project_actions.delete_project,
+              ["<c-v>"] = project_actions.rename_project,
+              ["<c-a>"] = project_actions.add_project,
+              ["<c-A>"] = project_actions.add_project_cwd,
+              ["<c-f>"] = project_actions.find_project_files,
+              ["<c-b>"] = project_actions.browse_project_files,
+              ["<c-s>"] = project_actions.search_in_project_files,
+              ["<c-r>"] = project_actions.recent_project_files,
+              ["<c-l>"] = project_actions.change_working_directory,
+              ["<c-o>"] = project_actions.next_cd_scope,
+              ["<c-w>"] = project_actions.change_workspace,
+            },
+          },
         },
       },
     }

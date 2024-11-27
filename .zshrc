@@ -40,10 +40,22 @@ alias pip="pip3"
 ## shell
 
 alias c="clear"
+function cmkd(){
+  mkdir "$1"
+  cd "$1"
+}
 
+function lsg(){
+  ls | grep "$1"
+}
+
+function lsr(){
+  ls -R | grep "$1"
+}
 
 ## git
 
+alias g="git"
 alias gs="git status -s"
 
 function ga() {
@@ -64,6 +76,8 @@ function gc() {
 ## tmux 
 
 alias t="tmux"
+alias ts="tmux list-sessions"
+alias tk="tmux kill-session -t"
 
 function tn(){
 	tmux new-session -s "$1"

@@ -26,7 +26,7 @@ return {
         center = {
           { action = 'lua LazyVim.pick()()',                           desc = " Find File",       icon = " ", key = "f" },
           { action = "ene | startinsert",                              desc = " New File",        icon = " ", key = "n" },
-          { action = function () vim.api.nvim_input("<cmd>lua require('telescope').extensions.project.project{}<cr>") end, desc = " Projects",        icon = " ", key = "p" },
+          { action = function () vim.api.nvim_input("<cmd>lua require('telescope').extensions.project.project()<cr>") end, desc = " Projects",        icon = " ", key = "p" },
           { action = 'lua LazyVim.pick("buffers")()',                  desc = " Buffers",         icon = "﬘ ", key = "b" },
           { action = 'lua LazyVim.pick("oldfiles")()',                 desc = " Recent Files",    icon = " ", key = "r" },
           { action = 'lua LazyVim.pick("live_grep")()',                desc = " Find Text",       icon = " ", key = "g" },

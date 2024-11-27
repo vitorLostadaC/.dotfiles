@@ -37,8 +37,6 @@ return {
     vim.cmd([[Neotree close]])
   end,
   init = function()
-    -- FIX: use `autocmd` for lazy-loading neo-tree instead of directly requiring it,
-    -- because `cwd` is not set up properly.
     vim.api.nvim_create_autocmd("BufEnter", {
       group = vim.api.nvim_create_augroup("Neotree_start_directory", { clear = true }),
       desc = "Start Neo-tree with directory",
@@ -116,6 +114,49 @@ return {
     },
   },
   config = function(_, opts)
+    local function getTelescopeOpts(state, path)
+      return {
+        cwd = path,
+        search_dirs = { path },
+        attach_mappings = function(prompt_bufnr, map)
+          local actions = require("telescope.actions")
+          actions.select_default:replace(function()
+            actions.close(prompt_bufnr)
+            local action_state = require("telescope.actions.state")
+            local selection = action_state.get_selected_entry()
+            local filename = selection.filename
+            if filename == nil then
+              filename = selection[1]
+            end
+            -- any way to open the file without triggering auto-close event of neo-tree?
+            require("neo-tree.sources.filesystem").navigate(state, state.path, filename)
+          end)
+          return true
+        end,
+      }
+    end
+
+    opts.filesystem = {
+      window = {
+        mappings = {
+          ["tf"] = "telescope_find",
+          ["tg"] = "telescope_grep",
+        },
+      },
+    }
+    opts.commands = {
+      telescope_find = function(state)
+        local node = state.tree:get_node()
+        local path = node:get_id()
+        require("telescope.builtin").find_files(getTelescopeOpts(state, path))
+      end,
+      telescope_grep = function(state)
+        local node = state.tree:get_node()
+        local path = node:get_id()
+        require("telescope.builtin").live_grep(getTelescopeOpts(state, path))
+      end,
+    }
+
     local function on_move(data)
       LazyVim.lsp.on_rename(data.source, data.destination)
     end
