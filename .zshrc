@@ -72,6 +72,18 @@ function gc() {
     git commit -m "$message"
 }
 
+## ai
+
+function ai(){
+  if [ -z "$1" ]; then
+    echo "Usage: ai <message>"
+    return 1
+  fi
+
+  sgpt "$*"
+
+}  
+
 
 ## tmux 
 
@@ -157,3 +169,9 @@ eval "$(zoxide init zsh)"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
