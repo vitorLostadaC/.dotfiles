@@ -58,6 +58,9 @@ function lsr(){
 alias g="git"
 alias gs="git status -s"
 
+alias git-paguesafe="git config user.name 'AnthonyPagueSafe' && git config user.email 'anthony.mengotti@paguesafe.com'"
+alias git-personal="git config user.name ‘VitorLostadaC’ && git config user.email ‘vitorlostada@hotmail.com‘"
+
 function ga() {
     if [ -z "$1" ]; then
         git add .
@@ -83,6 +86,7 @@ function ai(){
   sgpt "$*"
 
 }  
+
 
 
 ## tmux 
