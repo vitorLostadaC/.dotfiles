@@ -179,3 +179,11 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
+
+# tmux
+
+export TMUX_CONF="$HOME/.config/tmux/tmux.conf"
+
+if command -v tmux &> /dev/null && tmux info &> /dev/null; then
+  tmux source-file "$TMUX_CONF"
+fi
