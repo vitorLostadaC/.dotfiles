@@ -4,6 +4,20 @@ export TERM=xterm-256color
 
 ZSH_THEME="spaceship"
 
+autoload -Uz compinit
+compinit
+
+_makefile_targets() {
+  local -a targets
+  targets=(
+    $(make -qp 2>/dev/null \
+      | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ && !/^Makefile/ {print $1}' \
+      | sort -u)
+  )
+  compadd $targets
+}
+
+compdef _makefile_targets make
 
 zstyle ':omz:update' mode auto      # update automatically without asking
 
@@ -31,11 +45,14 @@ SPACESHIP_CHAR_SUFFIX=" "
 
 # Alias
 
+## Hermes
+
+alias dani="hermes"
+
 ## general
 
 alias vim=nvim
 alias pip="pip3"
-
 
 ## shell
 
@@ -58,7 +75,6 @@ function lsr(){
 alias g="git"
 alias gs="git status -s"
 
-alias git-paguesafe="git config user.name 'AnthonyPagueSafe' && git config user.email 'anthony.mengotti@paguesafe.com'"
 alias git-personal="git config user.name ‘VitorLostadaC’ && git config user.email ‘vitorlostada@hotmail.com‘"
 
 function ga() {
@@ -69,7 +85,7 @@ function ga() {
     fi
 }
 
-unalias gc
+(( ${+aliases[gc]} )) && unalias gc
 function gc() {
     local message="$*"
     git commit -m "$message"
@@ -87,8 +103,6 @@ function ai(){
 
 }  
 
-
-
 ## tmux 
 
 alias t="tmux"
@@ -98,7 +112,6 @@ alias tk="tmux kill-session -t"
 function tn(){
 	tmux new-session -s "$1"
 }
-
 
 ## zoxide
 
@@ -140,10 +153,7 @@ function zv() {
     fi
 }
 
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-PATH=~/.console-ninja/.bin:$PATH
-
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -166,14 +176,12 @@ esac
 eval $(thefuck --alias)
 eval "$(zoxide init zsh)"
 
-
 # bun completions
 [ -s "/Users/vitorlostada/.oh-my-zsh/completions/_bun" ] && source "/Users/vitorlostada/.oh-my-zsh/completions/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
-
 
 # pyenv
 export PYENV_ROOT="$HOME/.pyenv"
@@ -187,3 +195,54 @@ export TMUX_CONF="$HOME/.config/tmux/tmux.conf"
 if command -v tmux &> /dev/null && tmux info &> /dev/null; then
   tmux source-file "$TMUX_CONF"
 fi
+
+        export ANDROID_HOME="/Users/vitorlostada/Library/Android/sdk" 
+
+. "$HOME/.local/bin/env"
+export PATH="$HOME/.local/bin:$PATH"
+
+# Duplicate git repository excluding ignored files
+# Usage: duplicate-repo [source-dir] [dest-name]
+# Example: duplicate-repo . mono-repo-law
+function duplicate-repo() {
+    local source_dir="${1:-.}"
+    local dest_name="${2}"
+    
+    if [ -z "$dest_name" ]; then
+        echo "Usage: duplicate-repo [source-dir] <dest-name>"
+        echo "Example: duplicate-repo . mono-repo-law"
+        return 1
+    fi
+    
+    # Get absolute path of source directory
+    local source_abs=$(cd "$source_dir" && pwd)
+    local source_parent=$(dirname "$source_abs")
+    local dest_path="$source_parent/$dest_name"
+    
+    # Check if source is a git repository
+    if [ ! -d "$source_abs/.git" ]; then
+        echo "Error: $source_dir is not a git repository"
+        return 1
+    fi
+    
+    # Check if destination already exists
+    if [ -d "$dest_path" ]; then
+        echo "Error: Destination $dest_path already exists"
+        return 1
+    fi
+    
+    # Create destination directory and copy files
+    echo "Duplicating repository from $source_abs to $dest_path..."
+    mkdir -p "$dest_path"
+    cd "$source_abs" && git archive HEAD | tar -x -C "$dest_path"
+    
+    if [ $? -eq 0 ]; then
+        echo "✓ Successfully duplicated repository to $dest_path"
+    else
+        echo "✗ Failed to duplicate repository"
+        return 1
+    fi
+}
+
+# opencode
+export PATH=/Users/vitorlostada/.opencode/bin:$PATH
