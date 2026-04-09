@@ -1,0 +1,15 @@
+[user]
+	name = VitorLostadaC
+	email = vitorlostada@hotmail.com
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+	d = difftool
+[credential]
+	helper = store
+[push]
+	autoSetupRemote = true
+[init]
+	defaultBranch = main

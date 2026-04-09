@@ -4,24 +4,15 @@
 .LSOverride
 Thumbs.db
 
-# Secrets
+# Secrets (root level)
 .local/bin/env
 .env
-.auth.json
-.gateway_state.json
-.processes.json
 
-# Cache
-cache/
-audio_cache/
-image_cache/
-images/
-logs/
-state.db*
-checkpoints/
-sessions/
-memories/
-sandboxes/
+# Hermes secrets only (keep memories, skills, sessions)
+.hermes/.env
+.hermes/auth.json
+.hermes/gateway_state.json
+.hermes/processes.json
 
 # Lock files
 *.lock

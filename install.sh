@@ -2,6 +2,9 @@
 set -e
 
 DOTFILES="$HOME/.dotfiles"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
 
 echo "==> Installing Homebrew if needed..."
 if ! command -v brew >/dev/null 2>&1; then
@@ -11,25 +14,25 @@ fi
 echo "==> Installing Homebrew packages..."
 brew bundle --file="$DOTFILES/Brewfile" || true
 
-echo "==> Creating config symlinks..."
-mkdir -p "$HOME/.config"
+echo "==> Symlinking root config files..."
+# Root level configs
+ln -sf "$DOTFILES/.gitconfig" "$HOME/.gitconfig"
+ln -sf "$DOTFILES/.profile" "$HOME/.profile"
+ln -sf "$DOTFILES/.p10k.zsh" "$HOME/.p10k.zsh"
+ln -sf "$DOTFILES/.wakatime.cfg" "$HOME/.wakatime.cfg"
+ln -sf "$DOTFILES/.zshrc" "$HOME/.zshrc"
 
-# Link all configs from ~/.dotfiles/config
+echo "==> Creating ~/.config symlinks..."
+mkdir -p "$HOME/.config"
 for item in "$DOTFILES"/config/*; do
   name=$(basename "$item")
   target="$HOME/.config/$name"
-
-  # Skip certain configs
-  case "$name" in
-    ghostty|nvim|tmux|git|gh|htop|shell_gpt|zed)
-      if [ -e "$target" ] || [ -L "$target" ]; then
-        echo "  Skipping $name, already exists"
-      else
-        ln -s "$item" "$target"
-        echo "  Linked $name"
-      fi
-      ;;
-  esac
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    echo "  Skipping $name, already exists"
+  else
+    ln -s "$item" "$target"
+    echo "  Linked $name"
+  fi
 done
 
 echo "==> Setting up Oh-My-Zsh..."
@@ -41,60 +44,47 @@ fi
 # Install Oh-My-Zsh plugins
 OMZ_PLUGINS="$ZSH/custom/plugins"
 mkdir -p "$OMZ_PLUGINS"
-
-if [ ! -d "$OMZ_PLUGINS/zsh-autosuggestions" ]; then
-  git clone https://github.com/zsh-users/zsh-autosuggestions "$OMZ_PLUGINS/zsh-autosuggestions"
-fi
-
-if [ ! -d "$OMZ_PLUGINS/zsh-syntax-highlighting" ]; then
-  git clone https://github.com/zsh-users/zsh-syntax-highlighting "$OMZ_PLUGINS/zsh-syntax-highlighting"
-fi
+[ ! -d "$OMZ_PLUGINS/zsh-autosuggestions" ] && git clone https://github.com/zsh-users/zsh-autosuggestions "$OMZ_PLUGINS/zsh-autosuggestions"
+[ ! -d "$OMZ_PLUGINS/zsh-syntax-highlighting" ] && git clone https://github.com/zsh-users/zsh-syntax-highlighting "$OMZ_PLUGINS/zsh-syntax-highlighting"
 
 echo "==> Setting up TPM for tmux..."
-TMUX_PLUGINS="$HOME/.config/tmux/plugins"
-mkdir -p "$TMUX_PLUGINS"
-if [ ! -d "$TMUX_PLUGINS/tpm" ]; then
-  git clone https://github.com/tmux-plugins/tpm "$TMUX_PLUGINS/tpm"
-fi
+mkdir -p "$HOME/.config/tmux/plugins"
+[ ! -d "$HOME/.config/tmux/plugins/tpm" ] && git clone https://github.com/tmux-plugins/tpm "$HOME/.config/tmux/plugins/tpm"
 
 echo "==> Installing tmux plugins..."
-$TMUX_PLUGINS/tpm/bin/install_plugins
+"$HOME/.config/tmux/plugins/tpm/bin/install_plugins"
 
 echo "==> Setting up lazy.nvim for Neovim..."
-NVIM_LAZY="$HOME/.local/share/nvim/lazy/lazy.nvim"
-mkdir -p "$(dirname "$NVIM_LAZY")"
-if [ ! -d "$NVIM_LAZY" ]; then
-  git clone --filter=blob:none --branch=stable https://github.com/folke/lazy.nvim.git "$NVIM_LAZY"
-fi
+mkdir -p "$HOME/.local/share/nvim/lazy"
+[ ! -d "$HOME/.local/share/nvim/lazy/lazy.nvim" ] && git clone --filter=blob:none --branch=stable https://github.com/folke/lazy.nvim.git "$HOME/.local/share/nvim/lazy/lazy.nvim"
 
-echo "==> Symlinking shell configs..."
-# zshrc
-if [ ! -e "$HOME/.zshrc" ]; then
-  ln -s "$DOTFILES/.zshrc" "$HOME/.zshrc"
-else
-  echo "  Skipping .zshrc, already exists"
-fi
-
-# local bin
+echo "==> Setting up local bin..."
 mkdir -p "$HOME/.local/bin"
-if [ ! -e "$HOME/.local/bin/env" ]; then
-  ln -s "$DOTFILES/.local/bin/env" "$HOME/.local/bin/env"
-fi
+[ ! -e "$HOME/.local/bin/env" ] && ln -s "$DOTFILES/.local/bin/env" "$HOME/.local/bin/env"
 
-echo "==> Setting up Hermes config..."
+echo "==> Setting up Hermes..."
 mkdir -p "$HOME/.hermes"
-if [ ! -e "$HOME/.hermes/config.yaml" ]; then
-  ln -s "$DOTFILES/.hermes/config.yaml" "$HOME/.hermes/config.yaml"
-fi
+# Link Hermes config and important data (not secrets)
+ln -sf "$DOTFILES/.hermes/config.yaml" "$HOME/.hermes/config.yaml"
+ln -sf "$DOTFILES/.hermes/memories" "$HOME/.hermes/memories"
+ln -sf "$DOTFILES/.hermes/skills" "$HOME/.hermes/skills"
+ln -sf "$DOTFILES/.hermes/scripts" "$HOME/.hermes/scripts"
+# Copy (not link) auth.json template - user must fill in their API keys
+[ ! -e "$HOME/.hermes/auth.json" ] && cp "$DOTFILES/.hermes/auth.json" "$HOME/.hermes/auth.json"
 
 echo ""
 echo "========================================"
 echo "✅ Dotfiles setup complete!"
 echo ""
 echo "Next steps:"
-echo "  1. Restart your shell or run: source ~/.zshrc"
-echo "  2. Set up secrets in ~/.local/bin/env"
-echo "  3. Configure your API keys in ~/.hermes/config.yaml"
-echo "  4. Run 'tmux' to start tmux, then Ctrl+B I to install plugins"
-echo "  5. Open nvim and run :Lazy sync to install plugins"
+echo "  1. Restart shell or run: source ~/.zshrc"
+echo "  2. Fill in API keys:"
+echo "     - ~/.hermes/auth.json (OPENROUTER_API_KEY)"
+echo "     - ~/.wakatime.cfg (WAKATIME_API_KEY)"
+echo "     - ~/.local/bin/env (other secrets)"
+echo "  3. In tmux: Ctrl+B I to install plugins"
+echo "  4. In nvim: :Lazy sync to install plugins"
+echo ""
+echo "To backup Hermes data later:"
+echo "  ~/.dotfiles/backup-hermes.sh"
 echo "========================================"
